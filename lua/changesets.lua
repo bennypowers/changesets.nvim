@@ -110,9 +110,9 @@ end
 
 ---@param operation Operation
 local function on_select_package(operation)
-  return function (package)
-    if not package then return end
-    local name = get_name(package)
+  return function (manifest)
+    if not manifest then return end
+    local name = get_name(manifest)
     vim.ui.select({
       'patch',
       'minor',
@@ -135,14 +135,20 @@ end
 
 ---@param operation Operation
 local function make_operation(operation)
+  local select = on_select_package(operation)
   return function()
     if operation == 'add' and vim.bo.filetype ~= 'markdown' then
       print('Current buffer is not a changeset')
     else
-      vim.ui.select(get_public_workspace_packages(), {
-        prompt = 'Select Package',
-        format_item = get_name
-      }, on_select_package(operation))
+      local packages = get_public_workspace_packages()
+      if #packages == 1 then
+        select(packages[1])
+      else
+        vim.ui.select(packages, {
+          prompt = 'Select Package',
+          format_item = get_name
+        }, select)
+      end
     end
   end
 end
