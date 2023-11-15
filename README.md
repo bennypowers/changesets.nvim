@@ -2,6 +2,8 @@
 
 Easily create changesets using your favourite editor
 
+[changesets.nvim.webm](https://github.com/bennypowers/changesets.nvim/assets/1466420/ac1e670a-9be9-4177-99d7-8ae7033c2822)
+
 ## 🛌 Installation (Lazy)
 
 ```lua
