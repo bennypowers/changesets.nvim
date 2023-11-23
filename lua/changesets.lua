@@ -142,7 +142,7 @@ local function make_operation(operation)
     else
       local packages = get_public_workspace_packages()
       if #packages == 1 then
-        select(packages[1])
+        select(unpack(packages))
       else
         vim.ui.select(packages, {
           prompt = 'Select Package',
