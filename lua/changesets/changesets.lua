@@ -2,7 +2,7 @@ local M = {}
 
 local map = vim.tbl_map
 local filter = vim.tbl_filter
-local flatten = vim.tbl_flatten
+local function flatten(t) return vim.iter(t):flatten():totable() end
 
 ---@alias Release 'patch'|'minor'|'major'
 ---@alias Operation 'add'|'create'
@@ -15,14 +15,7 @@ local flatten = vim.tbl_flatten
 ---@type Release[]
 local RELEASE_KINDS = { 'patch', 'minor', 'major' }
 
---- Concatenate directories and/or file into a single path with normalization
---- (e.g., `"foo/"` and `"bar"` get joined to `"foo/bar"`)
---- TODO: remove for >=0.10
----@param ... string
----@return string
-local joinpath = vim.fs.joinpath or function(...)
-  return (table.concat({ ... }, '/'):gsub('//+', '/'))
-end
+local joinpath = vim.fs.joinpath
 
 ---@param manifest PackageJSON
 ---@return string name
@@ -38,7 +31,7 @@ local function find_package_json_ancestors(startpath)
   startpath = vim.fs.normalize(startpath or vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
   local result = vim.fs.find('package.json', {
     upward = true,
-    stop = vim.loop.os_homedir(),
+    stop = vim.uv.os_homedir(),
     path = startpath,
   })
   return result
@@ -46,7 +39,7 @@ end
 
 local function json_read_and_parse(path)
   local lines = vim.fn.readfile(path)
-  return vim.fn.json_decode(table.concat(lines))
+  return vim.json.decode(table.concat(lines))
 end
 
 local function get_pkg_manifests(relative_path)
